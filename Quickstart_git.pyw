@@ -33,21 +33,24 @@ class Window(tk.Frame):
         self.master.quit()
 
 def launch_apps():
-    # Setting up subprocess.Popen so apps open as minimised
+    # Setting up subprocess.Popen so apps open as minimised (if possible)
+    # More info @ https://msdn.microsoft.com/en-us/library/windows/desktop/ms633548(v=vs.85).aspx
     MINIMISE = 6
     info = subprocess.STARTUPINFO()
     info.dwFlags = subprocess.STARTF_USESHOWWINDOW
     info.wSHOWWINDOW = MINIMISE
 
+    # Get the list from Task Manager of processes, stripping them down to spam.exe
     exe_list = []
-    raw_list = popen('tasklist').read().strip().split('\n') # Get the list of processes
+    raw_list = popen('tasklist').read().strip().split('\n')
 
-    # Put all the app.exe in exe_list
+    # Put all exes in exe_list
     for item in raw_list:
         item = match('(\w+\.\w{3})', item)
         if item:
             exe_list.append(item.group(1))
 
+    # Replace XXXXXX with your username, check your paths work by calling Quickstart_git.pyw from the Python interpreter to see errors 
     if 'Viber.exe' not in exe_list:
         viber = subprocess.Popen('start /min C:\\Users\\XXXXXX\\AppData\\Local\\Viber\\Viber.exe', shell=True, startupinfo=info)
         sleep(5)
@@ -82,8 +85,8 @@ def main():
     app = Window(root)
 
     root.mainloop()
-
-    # Can put more code down here and it will be executed
+    
+    # We know result exists because we made it global
     if result:
         launch_apps()
     else:
